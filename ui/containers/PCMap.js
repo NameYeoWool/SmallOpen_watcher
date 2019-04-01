@@ -3,15 +3,16 @@ import {Image, Text, View, StyleSheet, Dimensions, TouchableOpacity, TouchableWi
 import React from "react";
 import MapView, {Marker} from 'react-native-maps';
 import Rating from "react-native-ratings/src/rating";
+import {geo_list} from "./Geo";
 
-var {height, width} = Dimensions.get('window');
+const {height, width} = Dimensions.get('window');
 //,,17z
 
 export default class PCMap extends Component {
   state = {
     region: {
-      latitude: 37.2961846,
-      longitude: 126.9745117,
+      latitude: 37.583709,
+      longitude: 127.000105,
       latitudeDelta: 0.0082,
       longitudeDelta: 0.0081,
     },
@@ -19,48 +20,10 @@ export default class PCMap extends Component {
       // {latlng: {latitude: 37.2988452, longitude: 126.972422}, title: "타이틀", description: "설명"},
       {latlng: {latitude: 37.2988452, longitude: 126.972422}, title: "초이스 PC방",},
     ],
-
+    geo: {id: 1,},
     showInfo: false,
   };
 
-  menus = [
-    {
-      id: 1, text: '대학로',
-      region: {
-        latitude: 37.583709,
-        longitude: 127.000105,
-        latitudeDelta: 0.0082,
-        longitudeDelta: 0.0081,
-      },
-    },
-    {
-      id: 2, text: '율전',
-      region: {
-        latitude: 37.2961846,
-        longitude: 126.9745117,
-        latitudeDelta: 0.0082,
-        longitudeDelta: 0.0081,
-      },
-    },
-    {
-      id: 3, text: '신촌',
-      region: {
-        latitude: 37.557398,
-        longitude: 126.938389,
-        latitudeDelta: 0.0082,
-        longitudeDelta: 0.0081,
-      },
-    },
-    {
-      id: 4, text: '홍대',
-      region: {
-        latitude: 37.556071,
-        longitude: 126.925558,
-        latitudeDelta: 0.0082,
-        longitudeDelta: 0.0081,
-      },
-    },
-  ];
 
   onRegionChange(region) {
     this.setState({region});
@@ -71,17 +34,20 @@ export default class PCMap extends Component {
       <View style={{width: '100%', height: '100%',}}>
 
         <View style={{marginTop: 30,}}>
-          <Text>ss</Text>
+          <Text> </Text>
           <View style={{flexDirection: 'row',}}>
-            {this.menus.map((menu) => {
+            {geo_list.map((menu) => {
               return (
                 <TouchableOpacity
-                  style={styles.gridItem}
+                  style={[styles.gridItem, {backgroundColor: (menu.id === this.state?.geo?.id) ? '#b99ef1' : '#ffffff'}]}
                   onPress={() => {
-                    this.setState({...this.state, region: menu.region})
+                    this.setState({...this.state, geo: menu, region: menu.region})
                   }}
                 >
-                  <Text style={styles.gridText}>{menu.text}</Text>
+                  <Text
+                    style={[styles.gridText, {color: (menu.id === this.state?.geo?.id) ? '#ffffff' : '#111111'}]}>
+                    {menu.text}
+                  </Text>
                 </TouchableOpacity>
               );
             })}
@@ -96,23 +62,36 @@ export default class PCMap extends Component {
             longitudeDelta: 0.0081,
           }}
           region={this.state.region}
-          onRegionChange={this.onRegionChange.bind(this)}
+          // onRegionChange={this.onRegionChange.bind(this)}
           style={{width: '100%', height: '100%',}}
           onPress={() => {
             if (this.state.showInfo === true)
               this.setState({showInfo: false,});
           }}
         >
-          {this.state.markers.map(marker => (
-            <Marker
-              coordinate={marker.latlng}
-              title={marker.title}
-              description={marker.description}
-              onPress={() => {
-                this.setState({showInfo: true,});
-              }}
-            />
-          ))}
+          {this.props.pc_rooms &&
+          this.props.pc_rooms.map((pc_room) => {
+            let marker = null;
+
+            if (pc_room.affiliate) {
+              marker = require('../../static/icon_mapmarker_50x50.png');
+            } else {
+              marker = require('../../static/icon_mapmarker_off_50x50.png');
+            }
+
+            return (<Marker
+                style={{width: 30, height: 30,}}
+                coordinate={{latitude: pc_room.latitude, longitude: pc_room.longitude}}
+                title={pc_room.name}
+                description={pc_room.address}
+                image={marker}
+                onPress={() => {
+                  this.setState({showInfo: true, pc_room: pc_room,});
+                }}
+              />
+            )
+          })
+          }
         </MapView>
 
 
@@ -134,13 +113,17 @@ export default class PCMap extends Component {
             <View>
 
               <View style={{flexDirection: 'row',}}>
-                <Text style={{fontSize: 18, color: 'white', width: '100%',}}>초이스 PC방</Text>
+                <Text style={{fontSize: 18, color: 'white', width: '100%',}}>{this.state.pc_room.name}</Text>
                 <View style={{position: 'absolute', top: 0, right: 110,}}>
-                  <Text style={{fontSize: 14, width: '100%', color: 'white',}}>잔여 좌석 : 12석</Text>
+
+                  {this.state.pc_room?.latest_seat?.data &&
+                  <Text style={{fontSize: 14, width: '100%', color: 'white',}}>잔여 좌석
+                    : {this.state.pc_room?.latest_seat?.data.empty_seats}석</Text>
+                  }
                 </View>
               </View>
 
-              <Text style={{fontSize: 13, color: 'white',}}>1.43km 수원시 장안구 서부로 2136</Text>
+              <Text style={{fontSize: 13, color: 'white',}}>0.0km {this.state.pc_room.address}</Text>
               <View style={{flexDirection: 'row', alignItems: 'center', width: '100%',}}>
 
                 {[1, 2, 3, 4, 5].map(() => {
@@ -156,7 +139,7 @@ export default class PCMap extends Component {
           <View style={{flexDirection: 'row',}}>
             <View style={{flex: 1,}}/>
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('TestContainer')}>
+              onPress={() => this.props.navigation.navigate('TestContainer', {pc_room: this.state.pc_room})}>
               <View style={styles.yellowButton}>
                 <Text style={{fontSize: 17,}}>좌석 확인하기</Text>
               </View>

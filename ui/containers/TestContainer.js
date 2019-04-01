@@ -14,7 +14,15 @@ export default class TestContainer extends Component {
 
   state = {selectedMenu: 1,};
 
+
+  componentDidMount(): void {
+    const pc_room = this.props.navigation.getParam('pc_room');
+    this.setState({pc_room});
+  }
+
   render() {
+    const {pc_room} = this.state;
+
     return (
       <View style={{backgroundColor: 'white',}}>
         <View style={{flexDirection: 'row',}}>
@@ -32,9 +40,9 @@ export default class TestContainer extends Component {
           })}
         </View>
         <ScrollView style={{backgroundColor: 'white',}}>
-          {this.state.selectedMenu === 1 && <SeatContainer/>}
-          {this.state.selectedMenu === 2 && <OptionContainer/>}
-          {this.state.selectedMenu === 3 && <ReviewContainer/>}
+          {this.state.selectedMenu === 1 && <SeatContainer pc_room={pc_room}/>}
+          {this.state.selectedMenu === 2 && <OptionContainer pc_room={pc_room}/>}
+          {this.state.selectedMenu === 3 && <ReviewContainer pc_room={pc_room}/>}
           <View style={{backgroundColor: 'white', height: 400,}}/>
         </ScrollView>
         <View style={{backgroundColor: 'white', height: 400,}}/>

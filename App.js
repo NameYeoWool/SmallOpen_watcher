@@ -12,6 +12,7 @@ import Main from "./ui/containers/Main";
 import {createStackNavigator} from "react-navigation";
 import TestContainer from "./ui/containers/TestContainer";
 
+
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:

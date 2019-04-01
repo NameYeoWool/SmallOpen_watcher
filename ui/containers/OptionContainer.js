@@ -1,18 +1,17 @@
 import {Component} from "react";
 import {View, Text, StyleSheet, ScrollView} from "react-native";
 import React from "react";
+import axios from "axios";
 
 export default class OptionContainer extends Component {
+  state = {
+    specs: [],
+  };
+
+  componentDidMount(): void {
+  }
+
   render() {
-    const options = [
-      {title: 'CPU', text: 'Intel i7-7700K'},
-      {title: '그래픽카드', text: '지포스 RTX 2080 Ti D6 11GB'},
-      {title: 'RAM', text: '32GB'},
-      {title: '모니터', text: ''},
-      {title: '헤드셋', text: ''},
-      {title: '키보드', text: ''},
-      {title: '마우스', text: ''},
-    ];
 
     return (
       <View>
@@ -22,9 +21,9 @@ export default class OptionContainer extends Component {
           <Text>사양</Text>
         </View>
 
-        <View>
+          <View>
           {
-            options.map((option) => {
+            this.props?.pc_room?.pc_spec?.map((option) => {
               return (
                 <View style={{flexDirection: 'row', alignItems: 'center',}}>
                   <Text style={styles.badge}>{option.title}</Text>
@@ -38,6 +37,8 @@ export default class OptionContainer extends Component {
         <View style={{padding: 10, backgroundColor: '#ebebeb'}}>
           <Text>공지사항</Text>
         </View>
+
+        <Text style={{padding: 10,}}>{this.props.pc_room && this.props.pc_room.notice}</Text>
 
       </View>
     );
