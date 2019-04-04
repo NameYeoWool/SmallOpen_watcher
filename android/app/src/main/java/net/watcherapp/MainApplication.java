@@ -1,4 +1,4 @@
-package com.watcher;
+package net.watcherapp;
 
 import android.app.Application;
 

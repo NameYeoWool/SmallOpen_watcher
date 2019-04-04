@@ -1,4 +1,4 @@
-package com.watcher;
+package net.watcherapp;
 
 import com.facebook.react.ReactActivity;
 import android.os.Bundle;
